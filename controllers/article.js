@@ -1,4 +1,5 @@
 // CONTROLADOR: article.js
+const validator = require("validator");
 
 
 // Controlador de prueba "prueba"
@@ -30,9 +31,41 @@ const prueba = (req, res) => {
    
  };
  
+//Controlador "create" que lee los valores recibidos en el cuerpo del request
+const create = (req, res) => {
+    //leemos los datos recibidos por post {title, contain}
+    let parametros = req.body;
+  
+    //validamos los datos
+    try {
+        let validaTitle_isEmpty = validator.isEmpty(parametros.title);
+        let validaTitleLength = validator.isLength(parametros.title, {min:5, max:30});
+
+
+        let validaContain_isEmpty = validator.isEmpty(parametros.contain);
+
+
+        if (validaTitle_isEmpty || !validaTitleLength || validaContain_isEmpty){
+            throw new Error("Información recibida no validada!");
+        }
+    }
+    catch(err){
+        return  res.status(400).json({
+            mensaje: "Se ha producido un error al validar datos en \/create",
+            status: "error: "+err.message
+        });
+    }
+
+    return res.status(200).json({
+        mensaje: "Guardamos datos con \/create",
+        parametros
+    });
+ };
  
+
  module.exports = {
     prueba,
-    cursos
+    cursos,
+    create
  }
  

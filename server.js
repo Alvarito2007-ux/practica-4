@@ -18,6 +18,7 @@ const puerto = 3900;
 app.use(cors());
 
 app.use(express.json());
+app.use(express.urlencoded({extended: true})); //recibe datos con content-type form-urlencoded
 
 
 
