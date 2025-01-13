@@ -18,6 +18,6 @@ router.get("/cursos", articleController.cursos);
 
 //Rutas Útiles
 router.post("/create", articleController.create);
-
+router.get("/lista/:id?:page?:limit?", articleController.getArticles);
 
 module.exports = router;

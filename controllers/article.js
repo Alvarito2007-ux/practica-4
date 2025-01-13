@@ -86,10 +86,84 @@ const create = async (req, res) => {
 
  };
  
+// Endpoint getArticles
+const getArticles = async (req, res) => {
+    try {
+      // parámetros opcionales ‘page’, ‘limit’ e ‘id’
+      // page: indica la página de la que quiero obtener los datos
+      //       por defecto si no se indica decimos que la 1
+      // limit: indica cuántos resultados quiero obtener, por defecto
+      //        si no se indica hasta 10
+       // id: indica el identificador único del artículo que quiero
+       //     recuperar
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const id = req.query.id;
+        
+  let articles;
+ 
+      // Si nos han pedido un artículo en concreto
+        if (id) {
+            try {
+                articles = await Article.find({_id: id})
+                // lean es por si solo queremos devolver los
+                // resultados de la colección, y no traer más
+                // información de mongoose de los datos leídos
+                                        .lean()
+                                        .exec();
+            }
+            // al filtrar por find, que es el equivalente a un WHERE en
+            // una consulta relacional, si no se encuentra el valor, se
+            // genera un error
+            catch (err) { 
+                return res.status(404).json({
+                    mensaje: `No se ha encontrado el artículo con el id: ${id} en /lista`,
+                    status: "error: " + err.message
+                });
+            }                                         
+        }
+        else {
+            articles = await Article.find({})
+            // Si indicamos una página, el valor del límite nos
+            // sirve para indicar cuantos artículos queremos por
+            // página y nos pagina el resultado obtenido
+                                    .skip((page - 1) * limit)
+                                    .limit(limit)
+            //más recientes primero, ordenamos por fecha en orden
+            // inverso (-1), si no indicamos nada o indicamos (1)
+            // sería de menor a mayor
+                                    .sort({date: -1})  
+                                    .lean()
+                                    .exec();
+        }
+
+        if (!articles || articles.length === 0) {
+            return res.status(404).json({
+                mensaje: "No se han encontrado artículos en /lista",
+                status: "error"
+            });
+        }
+ 
+ 
+        return res.status(200).json({
+            status: "success",
+            articles
+        });
+ 
+ 
+    } catch (err) {
+        return res.status(404).json({
+            mensaje: "Error desconocido al listar artí­culos en /lista",
+            status: "error: " + err
+        });
+    }
+ };
+ 
 
  module.exports = {
     prueba,
     cursos,
-    create
+    create,
+    getArticles
  }
  
