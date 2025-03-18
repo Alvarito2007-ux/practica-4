@@ -2,6 +2,7 @@ const {connection} = require("./database/connection");
 
 const express = require("express");
 const cors = require("cors");
+const path = require('path');
 
 //crear rutas
 const articleRoutes = require("./routes/article");
@@ -24,7 +25,8 @@ app.use(express.urlencoded({extended: true})); //recibe datos con content-type f
 
 app.use("/api", articleRoutes);
 
-
+// Configurar la carpeta public para archivos estáticos
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.get("/", (req,res) => {
     return res.status(200).send(`    
@@ -46,6 +48,7 @@ app.get("/prueba", (req,res) => {
 
         `);
 });
+
 
 //Crear servidor y escuchar peticiones
 
